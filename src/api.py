@@ -2,8 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 
-from model import rag_chain
-
+from src.model import rag_chain
 
 app = FastAPI(
     title="NovaTech Solutions Pvt. Ltd.",
@@ -13,7 +12,7 @@ app = FastAPI(
 
 
 class ChatRequest(BaseModel):
-    question: strg
+    question: str
 
 
 class ChatResponse(BaseModel):
