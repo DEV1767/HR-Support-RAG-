@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
-from loader import loade_document
-from Splitter import pdy_splitter
+from src.loader import loade_document
+from src.Splitter import pdy_splitter
 from langchain_jina import LateChunkEmbeddings
 
 load_dotenv()

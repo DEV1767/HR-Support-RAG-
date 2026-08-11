@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from qdrant_client.models import PointStruct
 
-from loader import loade_document
-from Splitter import pdy_splitter
-from embeddings import embedding
+from src.loader import loade_document
+from src.Splitter import pdy_splitter
+from src.embeddings import embedding
 
 load_dotenv()
 

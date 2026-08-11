@@ -1,5 +1,5 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from loader import loade_document
+from src.loader import loade_document
 
 
 def pdy_splitter(document):

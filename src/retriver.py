@@ -2,7 +2,7 @@ import os
 import time
 from dotenv import load_dotenv
 from langchain_qdrant import QdrantVectorStore
-from embeddings import embedding
+from src.embeddings import embedding
 
 load_dotenv()
 

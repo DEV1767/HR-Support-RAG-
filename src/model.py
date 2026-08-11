@@ -3,7 +3,7 @@ import time
 from dotenv import load_dotenv
 from operator import itemgetter
 
-from retriver import get_retriver
+from src.retriver import get_retriver
 
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
