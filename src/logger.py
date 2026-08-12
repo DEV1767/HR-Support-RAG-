@@ -1,22 +1,35 @@
 import logging
 import os
-from datetime import datetime
 
-LOGS_GIR = "logs"
-os.makedirs(LOGS_GIR, exist_ok=True)
 
-_run_started_at = datetime.now().strftime("%Y%m%d_%H%M%S")
-LOG_FILE = os.path.join(LOGS_GIR, f"run_{_run_started_at}.log")
+def get_logger(name):
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
-    handlers=[
-        logging.FileHandler(LOG_FILE, encoding="utf-8"),
-        logging.StreamHandler(),
-    ],
-)
+    logger = logging.getLogger(name)
 
-def get_logger(name:str)->logging.Logger:
-    return logging.getLogger(name)
-    
+    if logger.handlers:
+        return logger
+
+    logger.setLevel(logging.INFO)
+
+    formatter = logging.Formatter(
+        "%(asctime)s | %(levelname)s | %(name)s | %(message)s"
+    )
+
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    logger.addHandler(console_handler)
+
+    if os.getenv("VERCEL") != "1":
+
+        os.makedirs("logs", exist_ok=True)
+
+        file_handler = logging.FileHandler("logs/app.log", encoding="utf-8")
+
+        file_handler.setFormatter(formatter)
+
+        logger.addHandler(file_handler)
+
+    logger.propagate = False
+
+    return logger
