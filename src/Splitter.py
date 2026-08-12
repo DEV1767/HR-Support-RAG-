@@ -1,20 +1,34 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from src.loader import loade_document
+from src.loader import load_document
+from src.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 def pdy_splitter(document):
     """
-    Split the documnets into chunks
+    Split the documents into chunks
     """
-    splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=150)
+
+    logger.info("Splitting %s documents", len(document))
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=150
+    )
 
     chunks = splitter.split_documents(document)
+
+    logger.info(
+        "Splitting completed: %s chunks formed",
+        len(chunks)
+    )
 
     return chunks
 
 
 if __name__ == "__main__":
-    document = loade_document()
+    document = load_document()
     chunks = pdy_splitter(document)
-    
+
     print(chunks)

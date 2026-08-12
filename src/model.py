@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from operator import itemgetter
 
 from src.retriver import get_retriver
+from src.logger import get_logger
 
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
@@ -13,12 +14,13 @@ from langchain_core.runnables import RunnableParallel, RunnableLambda
 
 load_dotenv()
 
+logger = get_logger(__name__)
+
 
 model = ChatGroq(
     model="llama-3.3-70b-versatile",
     temperature=0
 )
-
 
 retriver = get_retriver()
 
@@ -46,11 +48,16 @@ def retrieve_and_format(question):
 
     start = time.perf_counter()
 
+    logger.info("Retrieving documents for question: %s", question)
+
     docs = retriver.invoke(question)
 
-    print(
-        f"Retrieval time: "
-        f"{time.perf_counter() - start:.2f}s"
+    retrieval_time = time.perf_counter() - start
+
+    logger.info(
+        "Retrieved %s documents in %.2f seconds",
+        len(docs),
+        retrieval_time
     )
 
     return "\n\n".join(
@@ -88,6 +95,8 @@ if __name__ == "__main__":
 
         start = time.perf_counter()
 
+        logger.info("RAG request started")
+
         print("\nAI Support:\n")
 
         for chunk in rag_chain.stream(
@@ -99,7 +108,14 @@ if __name__ == "__main__":
 
         print()
 
+        total_time = time.perf_counter() - start
+
         print(
             f"\nTotal time: "
-            f"{time.perf_counter() - start:.2f}s"
+            f"{total_time:.2f}s"
+        )
+
+        logger.info(
+            "RAG response completed in %.2f seconds",
+            total_time
         )
