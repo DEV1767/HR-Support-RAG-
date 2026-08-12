@@ -16,6 +16,7 @@ dependencies = [
     "langchain-jina>=0.0.1.dev0",
     "langchain-qdrant>=0.2.1",
     "langchain-text-splitters>=0.3.8",
+    "langsmith[claude-agent-sdk]>=0.1.147",
     "pypdf>=6.15.0",
     "qdrant-client>=1.19.0",
     "uvicorn>=0.52.1",
