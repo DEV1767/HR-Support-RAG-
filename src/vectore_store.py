@@ -1,4 +1,5 @@
 import os
+import time
 
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
@@ -7,37 +8,86 @@ from qdrant_client.models import PointStruct
 from src.loader import loade_document
 from src.Splitter import pdy_splitter
 from src.embeddings import embedding
+from src.logger import get_logger
+
 
 load_dotenv()
+
+logger = get_logger(__name__)
 
 
 def create_vector_store():
 
+    logger.info("Starting vector store creation")
+
+   
+    logger.info("Loading documents...")
+    start = time.perf_counter()
+
     document = loade_document()
+
+    logger.info(
+        "Documents loaded successfully: %s pages in %.2f seconds",
+        len(document),
+        time.perf_counter() - start
+    )
+
+    
+    logger.info("Splitting documents...")
+    start = time.perf_counter()
 
     chunks = pdy_splitter(document)
 
-    print(f"Total chunks: {len(chunks)}")
-
-    embedding_model = embedding()
-
-    print("Connecting to Qdrant Cloud.......")
-
-    client = QdrantClient(
-        url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"), timeout=60
+    logger.info(
+        "Document splitting completed: %s chunks created in %.2f seconds",
+        len(chunks),
+        time.perf_counter() - start
     )
 
-    print(client.get_collections())
-    print("Connected successfully!")
+    # Generate embeddings
+    logger.info("Initializing embedding model...")
+    embedding_model = embedding()
 
     texts = [chunk.page_content for chunk in chunks]
 
-    print("Generating embeddings...")
+    logger.info(
+        "Generating embeddings for %s chunks...",
+        len(texts)
+    )
+
+    start = time.perf_counter()
 
     vectors = embedding_model.embed_documents(texts)
 
-    print(f"Generated vectors: {len(vectors)}")
-    print(f"Vector dimension: {len(vectors[0])}")
+    logger.info(
+        "Embedding generation completed: %s vectors in %.2f seconds",
+        len(vectors),
+        time.perf_counter() - start
+    )
+
+    logger.info(
+        "Vector dimension: %s",
+        len(vectors[0])
+    )
+
+  
+    logger.info("Connecting to Qdrant Cloud...")
+
+    client = QdrantClient(
+        url=os.getenv("QDRANT_URL"),
+        api_key=os.getenv("QDRANT_API_KEY"),
+        timeout=60
+    )
+
+    logger.info("Connected to Qdrant successfully")
+
+    logger.info(
+        "Available Qdrant collections: %s",
+        client.get_collections()
+    )
+
+    
+    logger.info("Creating Qdrant points...")
 
     points = []
 
@@ -46,25 +96,49 @@ def create_vector_store():
         point = PointStruct(
             id=i,
             vector=vector,
-            payload={"page_content": chunk.page_content, "metadata": chunk.metadata},
+            payload={
+                "page_content": chunk.page_content,
+                "metadata": chunk.metadata
+            },
         )
 
         points.append(point)
 
-    print("Uploading vectors to Qdrant...")
+    logger.info(
+        "Created %s Qdrant points",
+        len(points)
+    )
 
-    client.upsert(collection_name="Hr_support", points=points)
+    
+    logger.info("Uploading vectors to Qdrant collection: Hr_support")
 
-    print("Upload completed successfully!")
+    start = time.perf_counter()
 
+    client.upsert(
+        collection_name="Hr_support",
+        points=points
+    )
+
+    logger.info(
+        "Vector upload completed in %.2f seconds",
+        time.perf_counter() - start
+    )
+
+   
     collection_info = client.get_collection("Hr_support")
 
-    print(f"Points currently in Hr_support: " f"{collection_info.points_count}")
+    logger.info(
+        "Points currently in Hr_support: %s",
+        collection_info.points_count
+    )
+
+    logger.info("Vector store creation completed successfully")
 
     return client
 
 
 if __name__ == "__main__":
+
     create_vector_store()
 
-    print("\nVector database created successfully!")
+    logger.info("Vector database created successfully!")
