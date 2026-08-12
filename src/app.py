@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
+from src.logger import get_logger
+
 
 from src.model import rag_chain
+
+logger=get_logger(__name__)
+
 
 app = FastAPI(
     title="NovaTech Solutions Pvt. Ltd.",
