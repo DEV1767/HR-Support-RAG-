@@ -10,7 +10,9 @@ HR Documents
 → Jina Embeddings
 → Qdrant Vector Database
 → Retriever
+→ Guardials
 → Groq LLM
+→ Guardials
 → AI HR Response
 → FastAPI
 
@@ -25,11 +27,14 @@ HR Documents
 - FastAPI API endpoint
 - Streaming response support
 - Retrieval and total response latency tracking
+- Added Guardials for security 
+- Monitoring of RAG using Langsmith
 
 ## Tech Stack
 
 - Python
 - LangChain
+- Langsmith
 - Jina Embeddings
 - Qdrant Cloud
 - Groq
